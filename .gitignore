@@ -1,0 +1,7 @@
+plugins
+hudson.model.UpdateCenter.xml
+hudson.plugins.git.GitTool.xml
+identity.key
+secret.key
+updates
+nodeMonitors.xml
