@@ -11,3 +11,10 @@ jobs
 .opam/
 .owner
 .viminfo
+*.swp
+.omake
+.lesshst
+*.log
+pbuilder
+queue.xml
+queue.xml.bak
