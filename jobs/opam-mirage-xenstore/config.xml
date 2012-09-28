@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector">
+    <hudson.triggers.TimerTrigger>
+      <spec>0 0 * * *
+</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+
+set -e
+set -x
+
+T=`pwd`
+
+rm -rf opam.git
+git clone git://github.com/OCamlPro/opam.git opam.git
+
+cd opam.git
+./configure --prefix=$T/opam
+make
+make install
+cd ..
+
+rm -rf $T/opam/dotopam
+
+export PATH=$PATH:$T/opam/bin
+export O=&quot;opam --root $T/opam/dotopam&quot;
+
+$O --yes init # default git://github.com/mirage/opam-repository
+eval `$O config -env`
+$O remote -kind git -add dev git://github.com/mirage/opam-repo-dev
+$O --yes switch -install 3.12.1+mirage-xen
+$O --yes switch 3.12.1+mirage-xen
+eval `$O config -env`
+$O --yes install xenstore
+$O --yes install mirage
+rm -rf ocaml-xenstore-xen
+git clone git://github.com/djs55/ocaml-xenstore-xen
+cd ocaml-xenstore-xen
+make
+
+
+
+
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.Mailer>
+      <recipients>jonathan.ludlam@eu.citrix.com</recipients>
+      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>false</sendToIndividuals>
+    </hudson.tasks.Mailer>
+  </publishers>
+  <buildWrappers/>
+</project>

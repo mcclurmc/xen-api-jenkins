@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+
+set -e
+set -x
+
+T=`pwd`
+
+rm -rf opam.git
+git clone git://github.com/OCamlPro/opam.git opam.git
+
+cd opam.git
+./configure --prefix=$T/opam
+make
+make install
+cd ..
+
+rm -rf $T/opam/dotopam
+
+export PATH=$PATH:$T/opam/bin
+export O=&quot;opam --root $T/opam/dotopam&quot;
+
+$O --yes init # default git://github.com/mirage/opam-repository
+$O --yes switch -install 3.12.1
+$O --yes switch 3.12.1
+eval `$O config -env`
+$O --yes install utop
+
+
+
+
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

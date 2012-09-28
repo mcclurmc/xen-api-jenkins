@@ -5,7 +5,6 @@ identity.key
 secret.key
 updates
 nodeMonitors.xml
-jobs
 .bash_history
 .ocp/
 .opam/
