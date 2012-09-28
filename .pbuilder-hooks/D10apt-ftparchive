@@ -1,0 +1,19 @@
+#!/bin/bash
+# http://www.tolaris.com/2009/04/09/adding-a-local-respository-to-pbuilder/
+# 2009-04-09 tyler - use previously built packages as an apt source
+# http://blog.edseek.com/~jasonb/articles/pbuilder_backports/pbuilderbuild.html#pbuilderhook
+
+set -e
+
+echo Calling $0
+#: ${DIST:=$(lsb_release --short --codename)}
+#: ${ARCH:=$(dpkg --print-architecture)}
+BUILDRESULT="/var/lib/jenkins/pbuilder/${DIST}_result"
+
+# create apt archive of previously built packages
+( dpkg-query -s apt-utils &> /dev/null || apt-get -y install apt-utils ; \
+cd $BUILDRESULT ; apt-ftparchive packages . > $BUILDRESULT/Packages )
+
+# see ~/.pbuilderrc for creation of $BUILDRESULT/Release
+
+apt-get update

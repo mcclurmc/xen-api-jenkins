@@ -1,0 +1,35 @@
+# http://www.tolaris.com/2009/04/09/adding-a-local-respository-to-pbuilder/
+
+MIRRORSITE=http://ubuntu.uk.xensource.com/ubuntu
+
+JENKINSHOME="/var/lib/jenkins"
+BUILDRESULT="${JENKINSHOME}/pbuilder/${DIST}_result/"
+
+HOOKDIR="/var/lib/jenkins/.pbuilder-hooks"
+OTHERMIRROR="deb file:$BUILDRESULT ./"
+BINDMOUNTS=${BUILDRESULT}
+
+# XXX FIXME! We should be signing our packages!
+ALLOWUNTRUSTED=yes
+
+# create local repository if it doesn't already exist,
+# such as during initial 'pbuilder create'
+if [ ! -d $BUILDRESULT ] ; then
+        mkdir -p $BUILDRESULT
+        # set permissions so I can delete files
+        chgrp xendev $BUILDRESULT
+        chmod g+rwx $BUILDRESULT
+fi
+if [ ! -e $BUILDRESULT/Packages ] ; then
+        touch $BUILDRESULT/Packages
+fi
+if [ ! -e $BUILDRESULT/Release ] ; then
+        cat << EOF > $BUILDRESULT/Release
+Archive: $DIST
+Component: main
+Origin: pbuilder
+Label: pbuilder
+Architecture: $ARCH
+EOF
+
+fi
